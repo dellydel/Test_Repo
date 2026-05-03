@@ -99,5 +99,3 @@ import {
                                                                                                                                                                                                                                                             ctx.textBaseline = "middle";
                                                                                                                                                                                                                                                               ctx.fillText("🍽️", cx, cy);
                                                                                                                                                                                                                                                               }
-                                                                                                                                                                                                                                                              
-}
