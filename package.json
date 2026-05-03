@@ -1,7 +1,7 @@
 {
-      "name": "dinner-spinner",
+      "name": "dinner-spunner",
         "version": "1.0.0",
-          "homepage": "https://dellydel.github.io/dinner-spunner",
+          "homepage": "https://dellydel.github.io/dinner-spinner",
             "scripts": {
                 "dev": "vite",
                     "build": "vite build",
