@@ -34,20 +34,16 @@ function haversine(lat1, lng1, lat2, lng2) {
   return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(1);
 }
 
-return new Promise((resolve, reject) => {
-  new window.google.maps.Geocoder().geocode(
-    { address: city },
-    (results, status) => {
-      if (status === "OK") resolve(results[0].geometry.location);
-      else reject(new Error(`Geocode failed: ${status}`));
-    },
-  );
-});
-
-function priceLevel(price) {
-  if (price === "$") return [0, 1];
-  if (price === "$$") return [0, 2];
-  return [0, 3];
+function geocodeCity(city) {
+  return new Promise((resolve, reject) => {
+    new window.google.maps.Geocoder().geocode(
+      { address: city },
+      (results, status) => {
+        if (status === "OK") resolve(results[0].geometry.location);
+        else reject(new Error(`Geocode failed: ${status}`));
+      },
+    );
+  });
 }
 
 export async function fetchRestaurants(city, filters) {
