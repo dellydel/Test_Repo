@@ -1,34 +1,4 @@
-import {
-  RESTAURANT_POOL,
-  CUISINES,
-  priceToNum,
-  distToNum,
-  SEGMENT_COLORS,
-} from "./constants";
-
-export function getRestaurants(filters) {
-  const cuisineVotes = filters.flatMap((f) => f.cuisine).filter(Boolean);
-  const priceVotes = filters.flatMap((f) => f.price).filter(Boolean);
-  const distVotes = filters.flatMap((f) => f.distance).filter(Boolean);
-
-  const allowedCuisines = cuisineVotes.length
-    ? [...new Set(cuisineVotes)]
-    : CUISINES;
-  const maxPrice = priceVotes.length
-    ? Math.max(...priceVotes.map((p) => priceToNum[p]))
-    : 3;
-  const maxDist = distVotes.length
-    ? Math.max(...distVotes.map((d) => distToNum[d]))
-    : 999;
-
-  let pool = allowedCuisines.flatMap((c) => RESTAURANT_POOL[c] || []);
-  pool = pool.filter(
-    (r) => priceToNum[r.price] <= maxPrice && r.distance <= maxDist,
-  );
-  pool = pool.sort(() => Math.random() - 0.5).slice(0, 6);
-  return pool.length >= 2 ? pool : RESTAURANT_POOL.American.slice(0, 6);
-}
-
+import { SEGMENT_COLORS } from "./constants";
 export function drawWheel(canvas, segments, rotation, eliminated = []) {
   if (!canvas || segments.length === 0) return;
   const ctx = canvas.getContext("2d");

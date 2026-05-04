@@ -95,7 +95,7 @@ export default function ResultScreen({ winner, city, onSpinAgain, onReset }) {
 
         {winner?.placeId && (
           <a
-            href={`https://www.google.com/maps/place/?q=place_id:${winner.placeId}`}
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(winner.name)}&query_place_id=${winner.placeId}`}
             target="_blank"
             rel="noopener noreferrer"
             style={{
