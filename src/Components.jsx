@@ -1,4 +1,5 @@
-import { CUISINES, PRICES, DISTANCES } from "./constants";
+import { useState } from "react";
+import { CUISINES, PRICES, DISTANCES, RATINGS } from "./constants";
 
 export function Header() {
   return (
@@ -63,9 +64,25 @@ export function FilterChip({ label, selected, onClick }) {
   );
 }
 
-export function UserFilterCard({ user, onRemove, onChange }) {
+export function UserFilterCard({ user, onRemove, onChange, onRename }) {
+  const [editing, setEditing] = useState(false);
+  const [nameVal, setNameVal] = useState(user.name);
   const toggle = (cat, val) => {
-    onChange(cat, user[cat] === val ? null : val);
+    if (cat === "cuisine") {
+      const current = user.cuisine || [];
+      if (current.includes(val)) {
+        onChange(cat, current.filter((c) => c !== val));
+      } else if (current.length < 3) {
+        onChange(cat, [...current, val]);
+      }
+    } else {
+      onChange(cat, user[cat] === val ? null : val);
+    }
+  };
+
+  const commitRename = () => {
+    onRename(nameVal.trim() || user.name);
+    setEditing(false);
   };
 
   return (
@@ -86,15 +103,39 @@ export function UserFilterCard({ user, onRemove, onChange }) {
           marginBottom: 10,
         }}
       >
-        <span
-          style={{
-            fontFamily: "Fredoka One, sans-serif",
-            fontSize: 17,
-            color: "#333",
-          }}
-        >
-          {user.name}
-        </span>
+        {editing ? (
+          <input
+            autoFocus
+            value={nameVal}
+            onChange={(e) => setNameVal(e.target.value)}
+            onBlur={commitRename}
+            onKeyDown={(e) => e.key === "Enter" && commitRename()}
+            style={{
+              fontFamily: "Fredoka One, sans-serif",
+              fontSize: 17,
+              color: "#333",
+              border: "none",
+              borderBottom: "2px solid #FF6B6B",
+              outline: "none",
+              width: "100%",
+              background: "transparent",
+            }}
+          />
+        ) : (
+          <span
+            onClick={() => setEditing(true)}
+            style={{
+              fontFamily: "Fredoka One, sans-serif",
+              fontSize: 17,
+              color: "#333",
+              cursor: "pointer",
+              borderBottom: "1px dashed #ccc",
+            }}
+            title="Click to rename"
+          >
+            {user.name}
+          </span>
+        )}
         <button
           onClick={onRemove}
           style={{
@@ -128,7 +169,7 @@ export function UserFilterCard({ user, onRemove, onChange }) {
             <FilterChip
               key={c}
               label={c}
-              selected={user.cuisine === c}
+              selected={( user.cuisine || []).includes(c)}
               onClick={() => toggle("cuisine", c)}
             />
           ))}
@@ -161,7 +202,7 @@ export function UserFilterCard({ user, onRemove, onChange }) {
         </div>
       </div>
 
-      <div>
+      <div style={{ marginBottom: 8 }}>
         <div
           style={{
             fontFamily: "Nunito, sans-serif",
@@ -182,6 +223,32 @@ export function UserFilterCard({ user, onRemove, onChange }) {
               label={d}
               selected={user.distance === d}
               onClick={() => toggle("distance", d)}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <div
+          style={{
+            fontFamily: "Nunito, sans-serif",
+            fontWeight: 800,
+            fontSize: 11,
+            color: "#aaa",
+            textTransform: "uppercase",
+            letterSpacing: 1,
+            marginBottom: 5,
+          }}
+        >
+          Min Rating
+        </div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+          {RATINGS.map((r) => (
+            <FilterChip
+              key={r}
+              label={`⭐ ${r}`}
+              selected={user.rating === r}
+              onClick={() => toggle("rating", r)}
             />
           ))}
         </div>

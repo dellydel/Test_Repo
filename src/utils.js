@@ -41,18 +41,30 @@ export function drawWheel(canvas, segments, rotation, eliminated = []) {
 
     ctx.font = `${Math.max(14, Math.min(22, W / 14))}px serif`;
     ctx.textAlign = "center";
-    ctx.fillText(seg.emoji, 0, -14);
+    ctx.fillText(seg.emoji, 0, -20);
 
     ctx.font = `bold ${Math.max(9, Math.min(13, W / 24))}px Nunito, sans-serif`;
     ctx.fillStyle = "#fff";
     ctx.shadowColor = "rgba(0,0,0,0.5)";
     ctx.shadowBlur = 3;
+    const maxWidth = r * 0.55;
     const words = seg.name.split(" ");
-    if (words.length <= 2 || arc > 1.2) {
-      ctx.fillText(seg.name, 0, 2);
+    const lines = words.length <= 2 || arc > 1.2
+      ? [seg.name]
+      : [words.slice(0, 2).join(" "), words.slice(2).join(" ")];
+
+    const truncate = (text) => {
+      if (ctx.measureText(text).width <= maxWidth) return text;
+      let t = text;
+      while (t.length > 1 && ctx.measureText(t + "\u2026").width > maxWidth) t = t.slice(0, -1);
+      return t + "\u2026";
+    };
+
+    if (lines.length === 1) {
+      ctx.fillText(truncate(lines[0]), 0, 8);
     } else {
-      ctx.fillText(words.slice(0, 2).join(" "), 0, -2);
-      ctx.fillText(words.slice(2).join(" "), 0, 12);
+      ctx.fillText(truncate(lines[0]), 0, 4);
+      ctx.fillText(truncate(lines[1]), 0, 18);
     }
     ctx.restore();
     drawn++;

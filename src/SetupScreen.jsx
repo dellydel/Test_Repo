@@ -1,19 +1,27 @@
 import { useState } from "react";
 import { Header, UserFilterCard } from "./Components";
+import FavoritesModal from "./FavoritesModal";
 
 export default function SetupScreen({ onStart }) {
   const [users, setUsers] = useState([
-    { id: 1, name: "Player 1", cuisine: null, price: null, distance: null },
+    { id: 1, name: "Guest 1", cuisine: [], price: null, distance: null, rating: null },
   ]);
   const [newName, setNewName] = useState("");
   const [mode, setMode] = useState("pick");
   const [city, setCity] = useState("Dallas, TX");
+  const [showFavorites, setShowFavorites] = useState(false);
+  const [selectedFavorite, setSelectedFavorite] = useState(null);
+
+  const handleFavoriteSelect = (fav) => {
+    setSelectedFavorite(fav);
+    setShowFavorites(false);
+  };
 
   const addUser = () => {
-    const name = newName.trim() || `Player ${users.length + 1}`;
+    const name = newName.trim() || `Guest ${users.length + 1}`;
     setUsers([
       ...users,
-      { id: Date.now(), name, cuisine: null, price: null, distance: null },
+      { id: Date.now(), name, cuisine: [], price: null, distance: null, rating: null },
     ]);
     setNewName("");
   };
@@ -146,7 +154,7 @@ export default function SetupScreen({ onStart }) {
               marginBottom: 10,
             }}
           >
-            👥 Players & Filters
+            Guests & Preferences
           </label>
           {users.map((u) => (
             <UserFilterCard
@@ -164,7 +172,7 @@ export default function SetupScreen({ onStart }) {
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && addUser()}
-            placeholder="Player name..."
+            placeholder="Guest name..."
             style={{
               flex: 1,
               padding: "11px 14px",
@@ -196,9 +204,53 @@ export default function SetupScreen({ onStart }) {
           </button>
         </div>
 
+        {/* Favorites */}
+        <div style={{ marginBottom: 20 }}>
+          <button
+            onClick={() => setShowFavorites(true)}
+            style={{
+              width: "100%",
+              padding: "12px",
+              borderRadius: 12,
+              border: "2px solid rgba(255,211,61,0.3)",
+              background: "rgba(255,211,61,0.08)",
+              color: "#FFD93D",
+              fontFamily: "Fredoka One, sans-serif",
+              fontSize: 18,
+              cursor: "pointer",
+            }}
+          >
+            ⭐ Add a Favorite to the Wheel
+          </button>
+          {selectedFavorite && (
+            <div
+              style={{
+                marginTop: 10,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                background: "rgba(255,211,61,0.1)",
+                border: "1px solid rgba(255,211,61,0.3)",
+                borderRadius: 12,
+                padding: "10px 14px",
+              }}
+            >
+              <span style={{ color: "#fff", fontFamily: "Nunito, sans-serif", fontWeight: 700, fontSize: 14 }}>
+                {selectedFavorite.emoji} {selectedFavorite.name} will be added to the wheel
+              </span>
+              <button
+                onClick={() => setSelectedFavorite(null)}
+                style={{ background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: 18, cursor: "pointer" }}
+              >
+                ×
+              </button>
+            </div>
+          )}
+        </div>
+
         {/* Start */}
         <button
-          onClick={() => onStart({ users, mode, city })}
+          onClick={() => onStart({ users, mode, city, favorite: selectedFavorite })}
           style={{
             width: "100%",
             padding: "16px",
@@ -216,6 +268,12 @@ export default function SetupScreen({ onStart }) {
           Find Restaurants! 🚀
         </button>
       </div>
+      {showFavorites && (
+        <FavoritesModal
+          onSelect={handleFavoriteSelect}
+          onClose={() => setShowFavorites(false)}
+        />
+      )}
     </div>
   );
 }

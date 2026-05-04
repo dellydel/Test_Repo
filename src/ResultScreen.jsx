@@ -1,6 +1,14 @@
+import { useState } from "react";
 import { Header } from "./Components";
+import { saveFavorite } from "./favorites";
 
 export default function ResultScreen({ winner, city, onSpinAgain, onReset }) {
+  const [saved, setSaved] = useState(false);
+
+  const handleSave = () => {
+    saveFavorite(winner);
+    setSaved(true);
+  };
   return (
     <div
       style={{
@@ -47,7 +55,7 @@ export default function ResultScreen({ winner, city, onSpinAgain, onReset }) {
             boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
           }}
         >
-          <div style={{ fontSize: 64, marginBottom: 12 }}>{winner?.emoji}</div>
+          <div style={{ fontSize: 64, marginBottom: 28 }}>{winner?.emoji}</div>
           <div
             style={{
               fontFamily: "Fredoka One, sans-serif",
@@ -78,6 +86,20 @@ export default function ResultScreen({ winner, city, onSpinAgain, onReset }) {
             >
               {winner?.price}
             </div>
+            {winner?.rating && (
+              <div
+                style={{
+                  background: "rgba(255,146,43,0.2)",
+                  borderRadius: 20,
+                  padding: "5px 14px",
+                  color: "#FF922B",
+                  fontWeight: 800,
+                  fontSize: 14,
+                }}
+              >
+                ⭐ {winner.rating}
+              </div>
+            )}
             <div
               style={{
                 background: "rgba(107,203,119,0.2)",
@@ -120,6 +142,25 @@ export default function ResultScreen({ winner, city, onSpinAgain, onReset }) {
         )}
 
         <button
+          onClick={handleSave}
+          disabled={saved}
+          style={{
+            width: "100%",
+            padding: "15px",
+            borderRadius: 16,
+            border: "none",
+            background: saved ? "rgba(255,255,255,0.08)" : "linear-gradient(135deg, #FFD93D, #FF922B)",
+            color: saved ? "rgba(255,255,255,0.4)" : "#fff",
+            fontFamily: "Fredoka One, sans-serif",
+            fontSize: 20,
+            cursor: saved ? "default" : "pointer",
+            marginBottom: 12,
+          }}
+        >
+          {saved ? "Saved to Favorites ✓" : "⭐ Save to Favorites"}
+        </button>
+
+        <button
           onClick={onSpinAgain}
           style={{
             width: "100%",
@@ -152,7 +193,7 @@ export default function ResultScreen({ winner, city, onSpinAgain, onReset }) {
             cursor: "pointer",
           }}
         >
-          Change Players / Filters
+          Change Guests & Preferences
         </button>
       </div>
     </div>

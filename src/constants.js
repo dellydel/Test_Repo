@@ -4,6 +4,7 @@ export const CUISINES = [
 ];
 export const PRICES = ["$", "$$", "$$$"];
 export const DISTANCES = ["< 1 mi", "< 2 mi", "< 5 mi", "Any"];
+export const RATINGS = ["2+", "3+", "4+", "4.5+"];
 
 export const SEGMENT_COLORS = [
   "#FF6B6B",

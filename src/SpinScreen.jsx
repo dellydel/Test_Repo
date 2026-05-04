@@ -6,14 +6,25 @@ export default function SpinScreen({ segments, mode, onResult, onReset }) {
   const [eliminated, setEliminated] = useState([]);
   const [spinning, setSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
+  const [wheelSize, setWheelSize] = useState(340);
 
   const canvasRef = useRef(null);
+  const containerRef = useRef(null);
   const animRef = useRef(null);
   const rotRef = useRef(0);
 
   useEffect(() => {
+    const observer = new ResizeObserver(([entry]) => {
+      const size = Math.min(entry.contentRect.width, 500);
+      setWheelSize(size);
+    });
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     drawWheel(canvasRef.current, segments, rotation, eliminated);
-  }, [segments, rotation, eliminated]);
+  }, [segments, rotation, eliminated, wheelSize]);
 
   const getActiveIndices = useCallback(() => {
     return segments.map((_, i) => i).filter((i) => !eliminated.includes(i));
@@ -44,9 +55,7 @@ export default function SpinScreen({ segments, mode, onResult, onReset }) {
         animRef.current = requestAnimationFrame(animate);
       } else {
         const arc = (2 * Math.PI) / active.length;
-        const normalized =
-          (2 * Math.PI - (current % (2 * Math.PI)) + Math.PI / 2) %
-          (2 * Math.PI);
+        const normalized = ((-(current % (2 * Math.PI))) + 2 * Math.PI) % (2 * Math.PI);
         const activeSlot = Math.floor(normalized / arc) % active.length;
         const landed = active[activeSlot];
         setSpinning(false);
@@ -83,8 +92,8 @@ export default function SpinScreen({ segments, mode, onResult, onReset }) {
       <Header />
       <div
         style={{
-          width: "100%",
-          maxWidth: 480,
+        width: "100%",
+          maxWidth: 540,
           padding: "0 16px",
           display: "flex",
           flexDirection: "column",
@@ -101,11 +110,12 @@ export default function SpinScreen({ segments, mode, onResult, onReset }) {
             border: `1px solid ${mode === "pick" ? "rgba(255,146,43,0.4)" : "rgba(255,107,107,0.4)"}`,
             color: mode === "pick" ? "#FF922B" : "#FF6B6B",
             borderRadius: 20,
-            padding: "5px 16px",
-            fontFamily: "Nunito, sans-serif",
+            padding: "12px 28px",
+            fontFamily: "Fredoka One, sans-serif",
             fontWeight: 800,
-            fontSize: 13,
-            marginBottom: 16,
+            fontSize: 22,
+            marginTop: 16,
+            marginBottom: 48,
           }}
         >
           {mode === "pick"
@@ -114,30 +124,30 @@ export default function SpinScreen({ segments, mode, onResult, onReset }) {
         </div>
 
         {/* Wheel + pointer */}
-        <div style={{ position: "relative", width: "100%", maxWidth: 340 }}>
+        <div ref={containerRef} style={{ position: "relative", width: "100%", maxWidth: 500, marginBottom: 32 }}>
           <div
             style={{
               position: "absolute",
-              top: -8,
+              top: -10,
               left: "50%",
               transform: "translateX(-50%)",
               width: 0,
               height: 0,
-              borderLeft: "14px solid transparent",
-              borderRight: "14px solid transparent",
-              borderTop: "30px solid #FFD93D",
+              borderLeft: `${wheelSize * 0.036}px solid transparent`,
+              borderRight: `${wheelSize * 0.036}px solid transparent`,
+              borderTop: `${wheelSize * 0.076}px solid #FFD93D`,
               filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.4))",
               zIndex: 10,
             }}
           />
           <canvas
             ref={canvasRef}
-            width={340}
-            height={340}
+            width={wheelSize}
+            height={wheelSize}
             style={{
               width: "100%",
               borderRadius: "50%",
-              boxShadow: "0 12px 40px rgba(0,0,0,0.5)",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
               display: "block",
             }}
           />
@@ -149,6 +159,7 @@ export default function SpinScreen({ segments, mode, onResult, onReset }) {
           disabled={spinning}
           style={{
             marginTop: 28,
+            width: "100%",
             padding: "16px 48px",
             borderRadius: 50,
             border: "none",
@@ -214,16 +225,17 @@ export default function SpinScreen({ segments, mode, onResult, onReset }) {
         <button
           onClick={onReset}
           style={{
-            marginTop: 20,
-            background: "none",
-            border: "1px solid rgba(255,255,255,0.15)",
-            color: "rgba(255,255,255,0.45)",
-            borderRadius: 10,
-            padding: "8px 20px",
-            fontFamily: "Nunito, sans-serif",
-            fontWeight: 700,
-            fontSize: 13,
+            marginTop: 16,
+            width: "100%",
+            padding: "16px 48px",
+            borderRadius: 50,
+            border: "none",
+            background: "rgba(255,255,255,0.1)",
+            color: "rgba(255,255,255,0.7)",
+            fontFamily: "Fredoka One, sans-serif",
+            fontSize: 22,
             cursor: "pointer",
+            letterSpacing: 0.5,
           }}
         >
           ← Back to Setup
