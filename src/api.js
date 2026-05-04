@@ -1,7 +1,14 @@
 const CUISINE_EMOJIS = {
-  italian: "🍝", mexican: "🌮", japanese: "🍣", american: "🍔",
-  thai: "🍜", indian: "🍛", chinese: "🥡", mediterranean: "🫒",
-  french: "🥐", greek: "🫕",
+  italian: "🍝",
+  mexican: "🌮",
+  japanese: "🍣",
+  american: "🍔",
+  thai: "🍜",
+  indian: "🍛",
+  chinese: "🥡",
+  mediterranean: "🫒",
+  french: "🥐",
+  greek: "🫕",
 };
 
 function loadMapsSDK() {
@@ -27,14 +34,15 @@ function haversine(lat1, lng1, lat2, lng2) {
   return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(1);
 }
 
-
-  return new Promise((resolve, reject) => {
-    new window.google.maps.Geocoder().geocode({ address: city }, (results, status) => {
+return new Promise((resolve, reject) => {
+  new window.google.maps.Geocoder().geocode(
+    { address: city },
+    (results, status) => {
       if (status === "OK") resolve(results[0].geometry.location);
       else reject(new Error(`Geocode failed: ${status}`));
-    });
-  });
-}
+    },
+  );
+});
 
 function priceLevel(price) {
   if (price === "$") return [0, 1];
@@ -51,9 +59,14 @@ export async function fetchRestaurants(city, filters) {
   const priceVotes = filters.flatMap((f) => f.price).filter(Boolean);
   const distVotes = filters.flatMap((f) => f.distance).filter(Boolean);
 
-  const distToMeters = { "< 1 mi": 1600, "< 2 mi": 3200, "< 5 mi": 8000, Any: 16000 };
+  const distToMeters = {
+    "< 1 mi": 1600,
+    "< 2 mi": 3200,
+    "< 5 mi": 8000,
+    Any: 16000,
+  };
   const maxDistKey = distVotes.length
-    ? distVotes.reduce((a, b) => distToMeters[a] > distToMeters[b] ? a : b)
+    ? distVotes.reduce((a, b) => (distToMeters[a] > distToMeters[b] ? a : b))
     : "Any";
   const radius = distToMeters[maxDistKey];
 
@@ -61,16 +74,21 @@ export async function fetchRestaurants(city, filters) {
     ? Math.max(...priceVotes.map((p) => ({ $: 1, $$: 2, $$$: 3 })[p]))
     : 3;
 
-  const keyword = cuisineVotes.length ? cuisineVotes[0].toLowerCase() : "restaurant";
+  const keyword = cuisineVotes.length
+    ? cuisineVotes[0].toLowerCase()
+    : "restaurant";
 
   return new Promise((resolve, reject) => {
     const service = new window.google.maps.places.PlacesService(
-      document.createElement("div")
+      document.createElement("div"),
     );
     service.nearbySearch(
       { location, radius, type: "restaurant", keyword },
       (results, status) => {
-        if (status !== window.google.maps.places.PlacesServiceStatus.OK || !results?.length) {
+        if (
+          status !== window.google.maps.places.PlacesServiceStatus.OK ||
+          !results?.length
+        ) {
           return reject(new Error("No restaurants found"));
         }
 
@@ -91,10 +109,18 @@ export async function fetchRestaurants(city, filters) {
             };
           });
 
-        resolve(filtered.length >= 2 ? filtered : results.slice(0, 6).map((r) => ({
-          name: r.name, price: "$$", distance: "?", emoji: "🍽️", placeId: r.place_id,
-        })));
-      }
+        resolve(
+          filtered.length >= 2
+            ? filtered
+            : results.slice(0, 6).map((r) => ({
+                name: r.name,
+                price: "$$",
+                distance: "?",
+                emoji: "🍽️",
+                placeId: r.place_id,
+              })),
+        );
+      },
     );
   });
 }
