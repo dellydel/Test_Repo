@@ -15,7 +15,19 @@ function loadMapsSDK() {
   });
 }
 
-function geocodeCity(city) {
+function haversine(lat1, lng1, lat2, lng2) {
+  const R = 3958.8;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2;
+  return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))).toFixed(1);
+}
+
+
   return new Promise((resolve, reject) => {
     new window.google.maps.Geocoder().geocode({ address: city }, (results, status) => {
       if (status === "OK") resolve(results[0].geometry.location);
@@ -68,10 +80,12 @@ export async function fetchRestaurants(city, filters) {
           .slice(0, 6)
           .map((r) => {
             const cuisine = cuisineVotes[0]?.toLowerCase() || "restaurant";
+            const rlat = r.geometry.location.lat();
+            const rlng = r.geometry.location.lng();
             return {
               name: r.name,
               price: ["$", "$", "$$", "$$$", "$$$"][r.price_level ?? 1],
-              distance: parseFloat((r.geometry.location.lat() * 0).toFixed(1)) || "?",
+              distance: haversine(location.lat(), location.lng(), rlat, rlng),
               emoji: CUISINE_EMOJIS[cuisine] || "🍽️",
               placeId: r.place_id,
             };

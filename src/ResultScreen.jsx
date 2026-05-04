@@ -93,6 +93,32 @@ export default function ResultScreen({ winner, city, onSpinAgain, onReset }) {
           </div>
         </div>
 
+        {winner?.placeId && (
+          <a
+            href={`https://www.google.com/maps/place/?q=place_id:${winner.placeId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "block",
+              width: "100%",
+              padding: "15px",
+              borderRadius: 16,
+              border: "none",
+              background: "linear-gradient(135deg, #4D96FF, #845EF7)",
+              color: "#fff",
+              fontFamily: "Fredoka One, sans-serif",
+              fontSize: 20,
+              cursor: "pointer",
+              boxShadow: "0 8px 24px rgba(77,150,255,0.35)",
+              marginBottom: 12,
+              textDecoration: "none",
+              boxSizing: "border-box",
+            }}
+          >
+            View on Google Maps 🗺️
+          </a>
+        )}
+
         <button
           onClick={onSpinAgain}
           style={{
