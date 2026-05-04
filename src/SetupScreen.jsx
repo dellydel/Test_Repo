@@ -7,7 +7,7 @@ export default function SetupScreen({ onStart }) {
   ]);
   const [newName, setNewName] = useState("");
   const [mode, setMode] = useState("pick");
-  const [city, setCity] = useState("New York, NY");
+  const [city, setCity] = useState("Dallas, TX");
 
   const addUser = () => {
     const name = newName.trim() || `Player ${users.length + 1}`;

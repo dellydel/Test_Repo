@@ -65,7 +65,7 @@ export async function fetchRestaurants(city, filters) {
         const priceMap = [1, 1, 2, 3, 3];
         const filtered = results
           .filter((r) => priceMap[r.price_level ?? 1] <= maxPrice)
-          .slice(0, 8)
+          .slice(0, 6)
           .map((r) => {
             const cuisine = cuisineVotes[0]?.toLowerCase() || "restaurant";
             return {
